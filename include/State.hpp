@@ -1,13 +1,17 @@
 #ifndef STATE__H
 #define STATE__H
 
-using namespace std;
 
 #include <string>
 #include <vector>
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+
+using std::string;
+using std::vector;
+using std::ostream;
+using std::endl;
 
 class State{
   string name;

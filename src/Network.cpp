@@ -420,93 +420,95 @@ void Network::findSPC(){
       }
     }
   }
- }
+  
+}
+
+
 
 void Network::addFinalTerminal() {  // HAS to be done only ONE time
-  for(map<string,vector<string> >::iterator it = partitions.begin(); it != partitions.end(); ++it) 
-  {
+  for(map<string,vector<string> >::iterator it = partitions.begin(); it != partitions.end(); ++it) {
     vector<PairSR> vpsr = sequences[(it->second).front()];  
     PairSR psr = *(vpsr.rbegin());
     
     vector<int> svec;
     
-    if(isTerminal(psr.first))
-    {
+    if(isTerminal(psr.first)){
       svec = terminal_states[psr.first].getVector();
-    } 
-    else 
-    {
+    } else {
       svec = states[psr.first].getVector();
     }
     
     vector<int> rvec = reactions[psr.second]; 
     
+    
     vector<int> resvec(rvec.size());
-    for(size_t i = 0; i < svec.size(); ++i) 
-    {
+    for(size_t i = 0; i < svec.size(); ++i) {
       resvec[i] = svec[i] + rvec[i];
     }
     
     bool not_fund = true;
-    map <string, State> all_states (states);
+    
+    map<string, State > all_states(states);
+    
     all_states.insert(terminal_states.begin(), terminal_states.end());
     
     map<string, State >::iterator jt = all_states.begin();
-    do 
-    {
+    do {
         svec = (jt->second).getVector();
         size_t i = 0;
         bool all_fund = true;
-        do 
-        {
-         all_fund = (svec[i] == resvec[i]);
-         ++i;
+        do {
+          all_fund = (svec[i] == resvec[i]);
+          ++i;
         } while( all_fund && (i < svec.size()));
         
         not_fund = !all_fund;
         ++jt;
-	} while( not_fund  && (jt != states.end()) );
+    } while( not_fund  && (jt != states.end()) );
     
-    if(!not_fund)
-    {
+    if(!not_fund){
       string id = ((--jt)->second).getName();
       ++jt;
       PairSR ts = make_pair( id ,"TR" );
-      for(vector<string>::iterator sit = (it->second).begin(); sit != (it->second).end();++sit ) 
-      { 
+      for(vector<string>::iterator sit = (it->second).begin(); sit != (it->second).end();++sit ) { 
         sequences[it->first].push_back(ts);
       }
     }
+    
   }
 }
 
 
+
 bool Network::testWPC(string xi, string xj, string ri, string rj){
   bool res = false;
-  if(xi != xj && ri != rj){
-    
-    vector<int> vi , vj;
+  if((xi != xj) && (ri != rj)){
+    vector<int> vi, vj;
     vector<int> ti = reactions[ri], tj = reactions[rj];
-    size_t nb_test = 0;
     
     if(isTerminal(xi)){
       vi = terminal_states[xi].getVector();
     } else {
-      vi= states[xi].getVector();
+      vi = states[xi].getVector();
     }
-     
+    
+    /* TODO : Opti needed*/
+    
     if(isTerminal(xj)){
       vj = terminal_states[xj].getVector();
     } else {
       vj = states[xj].getVector();
     }
     
+    size_t nb_test = 0;
+
     for (size_t index = 0; index < vi.size(); ++index) {
         int sum1 = vi[index] + tj[index];
         int sum2 = vj[index] + ti[index];
+        
         if(sum1 >=0 && sum1 <= upper[index] && sum2 >=0 && sum2 <= upper[index]){
-		++nb_test;
-	}
+            ++nb_test;
+        }
     }
     
     if((nb_test == vi.size())){
@@ -533,6 +535,7 @@ void Network::findWPC(){
     string id = it->first;
     vid.push_back(id); //Get the ID
     vseq.push_back(it->second); //Get the sequence
+    
   }
   
   for( unsigned i = 0 ; (i+1) < vseq.size(); ++i) {
@@ -542,26 +545,26 @@ void Network::findWPC(){
       ii = 0;
       found = false;
       while(!found && ii < vi.size()){
-  ij = 0;
-  xi = vi[ii].first;
-  ri = vi[ii].second;
-  while(!found && ij < vj.size()){
-    xj = vj[ij].first;
-    rj = vj[ij].second;
+        ij = 0;
+        xi = vi[ii].first;
+        ri = vi[ii].second;
+        while(!found && ij < vj.size()){
+          xj = vj[ij].first;
+          rj = vj[ij].second;
 
     
-    if (testWPC(xi, xj, ri, rj)) //WPC
-    {
-      cout <<"WPC found ";    
-	  cout << xi << " ";
-	  cout << ri << " ";
-	  cout << xj << " ";
-      cout << rj << " ";
-	  cout<<endl;
-    }
-    ++ij;
-  }
-  ++ii;
+          if (testWPC(xi, xj, ri, rj)) //WPC
+          {
+            cout << xi << " ";
+            cout << ri << " ";
+            cout << xj << " ";
+            cout << rj << " ";
+            cout <<"WPC found ";
+            cout << endl;
+          }
+          ++ij;
+        }
+        ++ii;
       }
     }
   }
@@ -584,6 +587,7 @@ void Network::printTS(ostream& o) const {
 
 
 string stox(string s){
+  assert(!s.empty());
   s[0] = 'x';
   return s;
 }

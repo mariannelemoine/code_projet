@@ -8,6 +8,15 @@
 #include <utility>
 #include <map>
 #include <queue>
+#include <cassert>
+
+
+using std::ifstream;
+using std::cstdlib;
+using std::sstream;
+using std::map;
+using std::pair;
+
 
 typedef pair<string,string> PairSR; //Pair (state,reaction)
 typedef pair<string,string> PairSS; //Pair (sequence,sequence)
