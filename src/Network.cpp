@@ -1,5 +1,12 @@
 #include "Network.hpp"
 
+#include <sstream>
+#include <iterator>
+
+
+using std::stringstream;
+using std::ostream_iterator;
+using std::ofstream;
 
 void Network::init(string file){
   ifstream fic;
@@ -525,7 +532,7 @@ void Network::findWPC(){
   vector< vector<PairSR > > vseq;
   vector<PairSR > vi, vj;
   vector<string> vid;
-  string xi, xj, ri, rj, qi, qj;
+  string xi, xj, ri, rj, qi, qj, s1, s2;
   PairSS pss;
   unsigned ii, ij;
   bool found;
@@ -555,7 +562,8 @@ void Network::findWPC(){
     
           if (testWPC(xi, xj, ri, rj)) //WPC
           {
-            cout << xi << " ";
+
+			cout << xi << " ";
             cout << ri << " ";
             cout << xj << " ";
             cout << rj << " ";

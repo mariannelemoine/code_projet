@@ -12,8 +12,9 @@
 
 
 using std::ifstream;
-using std::cstdlib;
-using std::sstream;
+using std::ostream;
+using std::string;
+using std::cout;
 using std::map;
 using std::pair;
 
