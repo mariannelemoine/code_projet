@@ -434,26 +434,20 @@ void Network::findSPC(){
 
 void Network::addFinalTerminal() {  // HAS to be done only ONE time
   for(map<string,vector<string> >::iterator it = partitions.begin(); it != partitions.end(); ++it) {
-    vector<PairSR> vpsr = sequences[(it->second).front()];  
-    PairSR psr = *(vpsr.rbegin());
+    const vector<PairSR> & vpsr = sequences[(it->second).front()];  // vector containing sequences of the partitions
+    const PairSR & psr = *(vpsr.rbegin());  // last pair of state and reaction 
     
-    vector<int> svec;
+    const vector<int> & svec = isTerminal(psr.first)?terminal_states[psr.first].getVector():states[psr.first].getVector();  // vector of the state
     
-    if(isTerminal(psr.first)){
-      svec = terminal_states[psr.first].getVector();
-    } else {
-      svec = states[psr.first].getVector();
-    }
-    
-    vector<int> rvec = reactions[psr.second]; 
+    const vector<int> & rvec = reactions[psr.second];  // vector of the reaction
     
     
-    vector<int> resvec(rvec.size());
-    for(size_t i = 0; i < svec.size(); ++i) {
-      resvec[i] = svec[i] + rvec[i];
-    }
+    vector<int> resvec;  // vector containing the result of the addition of the state vector and the reaction vector 
     
-    bool not_fund = true;
+    // adding the state vector and reaction vector (it is equivalent to apply the reaction to the state
+    std::transform(svec.begin(), svec.end(), rvec.begin(), std::back_inserter(resvec), std::plus<int>()); 
+    
+    bool not_fund = true;  // says whether  
     
     map<string, State > all_states(states);
     
@@ -461,7 +455,7 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
     
     map<string, State >::iterator jt = all_states.begin();
     do {
-        svec = (jt->second).getVector();
+        const vector<int> & svec = (jt->second).getVector();
         size_t i = 0;
         bool all_fund = true;
         do {
@@ -487,7 +481,7 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
 
 
 
-bool Network::testWPC(string xi, string xj, string ri, string rj){
+bool Network::testWPC(const string & xi, const string & xj, const string & ri, const string & rj){
   bool res = false;
   if((xi != xj) && (ri != rj)){
     vector<int> vi, vj;
@@ -529,38 +523,38 @@ bool Network::testWPC(string xi, string xj, string ri, string rj){
 
 void Network::burgerFrites(const string & xi, const string & xj, const string & ri, const string & rj)
 {
-	vector<int> diff1, diff2;
-	const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector();
-	const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector();
+  vector<int> diff1, diff2;
+  const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector();
+  const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector();
  
-	if(ri!="TR")
-	{
-		//diff1=vecti-vectj;
-		transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());
-		
-		
-		if(find_if(
-			diff1.begin(),
-			diff1.end(),
-			std::bind2nd(std::less_equal<int>(), 0)
-		) == diff1.end())
-		{
-			cout<<"inhibiteur arc"<<endl;
-		}	
-	}
-	if (rj!="TR")
-	{
-		assert(vectj.size() <= vecti.size());
-		transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());
-		if(find_if(
-			diff2.begin(),
-			diff2.end(),
-			std::bind2nd(std::less_equal<int>(), 0)
-		) == diff2.end())
-		{
-			cout<< "read arc" <<endl;
-		}
-	}
+  if(ri!="TR")
+  {
+    //diff1=vecti-vectj;
+    transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());
+    
+    
+    if(find_if(
+      diff1.begin(),
+      diff1.end(),
+      std::bind2nd(std::less_equal<int>(), 0)
+    ) == diff1.end())
+    {
+      cout<<"inhibiteur arc"<<endl;
+    } 
+  }
+  if (rj!="TR")
+  {
+    assert(vectj.size() <= vecti.size());
+    transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());
+    if(find_if(
+      diff2.begin(),
+      diff2.end(),
+      std::bind2nd(std::less_equal<int>(), 0)
+    ) == diff2.end())
+    {
+      cout<< "read arc" <<endl;
+    }
+  }
 
 }
 
@@ -598,7 +592,7 @@ void Network::findWPC(){
     
           if (testWPC(xi, xj, ri, rj)) //WPC
           {
-			burgerFrites(xi, xj, ri, rj);
+      burgerFrites(xi, xj, ri, rj);
           }
           ++ij;
         }

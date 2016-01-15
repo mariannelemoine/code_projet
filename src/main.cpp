@@ -1,5 +1,8 @@
 #include "Network.hpp"
 
+using std::cerr;
+using std::stringstream;
+
 int main(int argc,char** argv){
   if (argc <= 1 || argc > 2)
   {
