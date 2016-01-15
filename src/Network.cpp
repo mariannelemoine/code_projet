@@ -471,7 +471,7 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
         
         not_fund = !all_fund;
         ++jt;
-    } while( not_fund  && (jt != states.end()) );
+    } while( not_fund  && (jt != all_states.end()) );
     
     if(!not_fund){
       string id = ((--jt)->second).getName();
@@ -499,7 +499,7 @@ bool Network::testWPC(string xi, string xj, string ri, string rj){
       vi = states[xi].getVector();
     }
     
-    /* TODO : Opti needed*/
+    /* TODO : facto needed*/
     
     if(isTerminal(xj)){
       vj = terminal_states[xj].getVector();
@@ -527,6 +527,42 @@ bool Network::testWPC(string xi, string xj, string ri, string rj){
   return res;
 }
 
+void Network::burgerFrites(const string & xi, const string & xj, const string & ri, const string & rj)
+{
+	vector<int> diff1, diff2;
+	const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector();
+	const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector();
+ 
+	if(ri!="TR")
+	{
+		//diff1=vecti-vectj;
+		transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());
+		
+		
+		if(find_if(
+			diff1.begin(),
+			diff1.end(),
+			std::bind2nd(std::less_equal<int>(), 0)
+		) == diff1.end())
+		{
+			cout<<"inhibiteur arc"<<endl;
+		}	
+	}
+	if (rj!="TR")
+	{
+		assert(vectj.size() <= vecti.size());
+		transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());
+		if(find_if(
+			diff2.begin(),
+			diff2.end(),
+			std::bind2nd(std::less_equal<int>(), 0)
+		) == diff2.end())
+		{
+			cout<< "read arc" <<endl;
+		}
+	}
+
+}
 
 void Network::findWPC(){
   vector< vector<PairSR > > vseq;
@@ -562,13 +598,7 @@ void Network::findWPC(){
     
           if (testWPC(xi, xj, ri, rj)) //WPC
           {
-
-			cout << xi << " ";
-            cout << ri << " ";
-            cout << xj << " ";
-            cout << rj << " ";
-            cout <<"WPC found ";
-            cout << endl;
+			burgerFrites(xi, xj, ri, rj);
           }
           ++ij;
         }
