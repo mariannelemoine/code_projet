@@ -447,34 +447,39 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
     // adding the state vector and reaction vector (it is equivalent to apply the reaction to the state
     std::transform(svec.begin(), svec.end(), rvec.begin(), std::back_inserter(resvec), std::plus<int>()); 
     
-    bool not_fund = true;  // says whether  
+    bool not_found = true;  // says whether if there is a state vector with the same coordinates than the result vector
     
+    // creates a map containing all the state vectors
     map<string, State > all_states(states);
-    
     all_states.insert(terminal_states.begin(), terminal_states.end());
     
-    map<string, State >::iterator jt = all_states.begin();
+    map<string, State >::iterator jt = all_states.begin();  // iterates over the states
     do {
-        const vector<int> & svec = (jt->second).getVector();
-        size_t i = 0;
-        bool all_fund = true;
+        const vector<int> & svec = (jt->second).getVector();  // state vector
+        size_t i = 0;  
+        bool all_found = true;  // says whether if all the coordinates of the two vectors are equal
         do {
-          all_fund = (svec[i] == resvec[i]);
+          all_found = (svec[i] == resvec[i]);  // test  if the coordinates of the two vectors are equal
           ++i;
-        } while( all_fund && (i < svec.size()));
+        } while( all_found && (i < svec.size()));
         
-        not_fund = !all_fund;
+        not_found = !all_found;  // if all the coordinates are the same, then the good state vector has been found
         ++jt;
-    } while( not_fund  && (jt != all_states.end()) );
+    } while( not_found  && (jt != all_states.end()) );
     
-    if(!not_fund){
-      string id = ((--jt)->second).getName();
+    if(!not_found){  // if the state vector is found
+      
+      string id = ((--jt)->second).getName();  // get the name of the name of the state
+      // Why not using (--jt)->first ?
+      
       ++jt;
-      PairSR ts = make_pair( id ,"TR" );
-      for(vector<string>::iterator sit = (it->second).begin(); sit != (it->second).end();++sit ) { 
-        sequences[it->first].push_back(ts);
+      PairSR ts = make_pair( id ,"TR" );  // make a pair with the name of the state and the terminal reaction 
+      for(vector<string>::iterator sit = (it->second).begin(); sit != (it->second).end();++sit ) {  // add the pair at the end of each sequances of the partition
+        sequences[it->first].push_back(ts);  
       }
     }
+    
+    // TODO : do something if there is no state vector found
     
   }
 }
@@ -482,10 +487,10 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
 
 
 bool Network::testWPC(const string & xi, const string & xj, const string & ri, const string & rj){
-  bool res = false;
-  if((xi != xj) && (ri != rj)){
-    vector<int> vi, vj;
-    vector<int> ti = reactions[ri], tj = reactions[rj];
+  bool res = false;  // true if (xi, ri) and (xj, rj) are in WPC
+  if((xi != xj) && (ri != rj)){  // a WPC is possible in this case 
+    vector<int> vi, vj;  // state vectors  
+    vector<int> ti = reactions[ri], tj = reactions[rj];  // transition vectors
     
     if(isTerminal(xi)){
       vi = terminal_states[xi].getVector();
@@ -504,15 +509,17 @@ bool Network::testWPC(const string & xi, const string & xj, const string & ri, c
     size_t nb_test = 0;
 
     for (size_t index = 0; index < vi.size(); ++index) {
+        
+        // computes the sum of state vectors and the transition vectors at the place number index
         int sum1 = vi[index] + tj[index];
         int sum2 = vj[index] + ti[index];
         
-        if(sum1 >=0 && sum1 <= upper[index] && sum2 >=0 && sum2 <= upper[index]){
+        if(sum1 >=0 && sum1 <= upper[index] && sum2 >=0 && sum2 <= upper[index]){  // check if the transitions are enabled for the place number index
             ++nb_test;
         }
     }
     
-    if((nb_test == vi.size())){
+    if((nb_test == vi.size())){  // if the two transitions are enabled for all places in the two states, then xi, ri) and (xj, rj) are in WPC
       res = true; 
     }
     
@@ -533,26 +540,26 @@ void Network::burgerFrites(const string & xi, const string & xj, const string & 
     transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());
     
     
-    if(find_if(
-      diff1.begin(),
-      diff1.end(),
-      std::bind2nd(std::less_equal<int>(), 0)
-    ) == diff1.end())
-    {
-      cout<<"inhibiteur arc"<<endl;
-    } 
+    for(vector<int>::iterator it = diff1.begin(); it != diff1.end(); ++it){
+        if(*it < 0){
+          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+        } else if(*it > 0) {
+          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          cout<< "coucou"<<endl;
+        }
+    }
+     
   }
   if (rj!="TR")
   {
-    assert(vectj.size() <= vecti.size());
     transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());
-    if(find_if(
-      diff2.begin(),
-      diff2.end(),
-      std::bind2nd(std::less_equal<int>(), 0)
-    ) == diff2.end())
-    {
-      cout<< "read arc" <<endl;
+
+    for(vector<int>::iterator it = diff2.begin(); it != diff2.end(); ++it){
+        if(*it < 0){
+          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+        } else if(*it > 0) {
+          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+        }
     }
   }
 
@@ -592,7 +599,7 @@ void Network::findWPC(){
     
           if (testWPC(xi, xj, ri, rj)) //WPC
           {
-      burgerFrites(xi, xj, ri, rj);
+            burgerFrites(xi, xj, ri, rj);
           }
           ++ij;
         }
