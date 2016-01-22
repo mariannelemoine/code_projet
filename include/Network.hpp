@@ -9,6 +9,7 @@
 #include <map>
 #include <queue>
 #include <cassert>
+#include <set>
 
 
 using std::ifstream;
@@ -17,11 +18,15 @@ using std::string;
 using std::cout;
 using std::map;
 using std::pair;
+using std::set;
 
 
 typedef pair<string,string> PairSR; //Pair (state,reaction)
 typedef pair<string,string> PairSS; //Pair (sequence,sequence)
 
+/* foward declarations */
+class ControlArc;
+struct CompareControlArc;
 
 class Network{
   int dim; //Number of places
@@ -34,6 +39,7 @@ class Network{
   map<string,vector<string> > partitions;
   vector<PairSS > spc; //Vector of sequences that are in SPC
   vector<string> tsequences; //Sequences' id that contains a terminal_state
+  set<ControlArc, CompareControlArc> control_arcs;  // contain all the control arcs // BUG
   
   
   void readStates(ifstream&); //Reads STATES and TERMINAL_STATES
@@ -45,6 +51,7 @@ class Network{
   bool isTerminal(const string & xi) {return terminal_states.find(xi) != terminal_states.end(); }  // Test whether a state is terminal
   void addFinalTerminal() ;  // Add the final state in the sequences if it is terminal
   void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); //
+  void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); 
   
   public:
   void removeSequences() ; //Remove all sequences that contains a terminal_state

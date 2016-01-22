@@ -534,6 +534,7 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
   const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector(); // transform the string into a vector xi 
   const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector(); // transform the string into a vector xj
   unsigned int cpt=0;
+
  
   if(ri!="TR")
   {    
@@ -541,18 +542,18 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
         
     for(vector<int>::iterator it = diff1.begin(); it != diff1.end(); ++it)
     {
-		if(*it < 0)
+    if(*it < 0)
         {
           cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           ControlArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1); // initializes an inhibitor-arc
           cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
-  		} 
+      } 
         else if(*it > 0) 
         {
           cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           ControlArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1); // initializes a read-arc
           cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
-		}
+    }
         ++cpt;
     }
   }
@@ -560,16 +561,16 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
   cpt=0;
      
   if (rj!="TR")
-  {	
+  { 
     transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());// diff2=vectj-vecti (xj-xi)
 
     for(vector<int>::iterator it = diff2.begin(); it != diff2.end(); ++it)
     {
-		if(*it < 0)
+    if(*it < 0)
         {
           cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           ControlArc(names[cpt], rj, true, static_cast <unsigned int> (vectj[cpt])+1); // initializes an inhibitor-arc
-		  cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
+      cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
         }
         
         else if(*it > 0)
