@@ -14,7 +14,7 @@ using std::ostream;
 using std::endl;
 
 class State{
-  string name;
+  string name; // name of the state
   vector<int> vec;
   
   void swap(State&);
@@ -24,8 +24,8 @@ class State{
   State(string,vector<int>);
   
   
-  const string& getName() const ;
-  const vector<int>& getVector() const ;
+  const string& getName() const ; // get the name
+  const vector<int>& getVector() const ; // get the vector
   
 };
 

@@ -44,7 +44,7 @@ class Network{
   bool testWPC(const string & xi, const string & xj, const string & ri, const string & rj) ;  // Test if the couple of pairs states and transitions are in a WPC
   bool isTerminal(const string & xi) {return terminal_states.find(xi) != terminal_states.end(); }  // Test whether a state is terminal
   void addFinalTerminal() ;  // Add the final state in the sequences if it is terminal
-  void burgerFrites(const string & xi, const string & xj, const string & ri, const string & rj); //Rename!!!
+  void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); //
   
   public:
   void removeSequences() ; //Remove all sequences that contains a terminal_state

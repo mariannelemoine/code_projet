@@ -1,4 +1,5 @@
 #include "Network.hpp"
+#include "ControlArc.hpp"
 
 #include <sstream>
 #include <iterator>
@@ -7,6 +8,7 @@
 using std::stringstream;
 using std::ostream_iterator;
 using std::ofstream;
+
 
 void Network::init(string file){
   ifstream fic;
@@ -457,7 +459,7 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
     do {
         const vector<int> & svec = (jt->second).getVector();  // state vector
         size_t i = 0;  
-        bool all_found = true;  // says whether if all the coordinates of the two vectors are equal
+        bool all_found = true;  // says whether all the coordinates of the two vectors are equal
         do {
           all_found = (svec[i] == resvec[i]);  // test  if the coordinates of the two vectors are equal
           ++i;
@@ -501,17 +503,16 @@ bool Network::testWPC(const string & xi, const string & xj, const string & ri, c
     /* TODO : facto needed*/
     
     if(isTerminal(xj)){
-      vj = terminal_states[xj].getVector();
+      vj = terminal_states[xj].getVector(); // get the vector of xj
     } else {
-      vj = states[xj].getVector();
+      vj = states[xj].getVector(); // get the vector of xi
     }
     
     size_t nb_test = 0;
 
     for (size_t index = 0; index < vi.size(); ++index) {
         
-        // computes the sum of state vectors and the transition vectors at the place number index
-        int sum1 = vi[index] + tj[index];
+        int sum1 = vi[index] + tj[index];// computes the sum of state vectors and the transition vectors at the place number index
         int sum2 = vj[index] + ti[index];
         
         if(sum1 >=0 && sum1 <= upper[index] && sum2 >=0 && sum2 <= upper[index]){  // check if the transitions are enabled for the place number index
@@ -519,50 +520,67 @@ bool Network::testWPC(const string & xi, const string & xj, const string & ri, c
         }
     }
     
-    if((nb_test == vi.size())){  // if the two transitions are enabled for all places in the two states, then xi, ri) and (xj, rj) are in WPC
+    if((nb_test == vi.size())){  // if the two transitions are enabled for all places in the two states, then (xi, ri) and (xj, rj) are in WPC
       res = true; 
     }
     
   }
-
   return res;
 }
 
-void Network::burgerFrites(const string & xi, const string & xj, const string & ri, const string & rj)
+void Network::createControlArc(const string & xi, const string & xj, const string & ri, const string & rj)
 {
-  vector<int> diff1, diff2;
-  const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector();
-  const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector();
+  vector<int> diff1, diff2; // difference vector
+  const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector(); // transform the string into a vector xi 
+  const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector(); // transform the string into a vector xj
+  unsigned int cpt=0;
  
   if(ri!="TR")
-  {
-    //diff1=vecti-vectj;
-    transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());
-    
-    
-    for(vector<int>::iterator it = diff1.begin(); it != diff1.end(); ++it){
-        if(*it < 0){
+  {    
+    transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());//diff1=vecti-vectj
+        
+    for(vector<int>::iterator it = diff1.begin(); it != diff1.end(); ++it)
+    {
+		if(*it < 0)
+        {
           cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-        } else if(*it > 0) {
+          ControlArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1); // initializes an inhibitor-arc
+          cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
+  		} 
+        else if(*it > 0) 
+        {
           cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          cout<< "coucou"<<endl;
-        }
+          ControlArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1); // initializes a read-arc
+          cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
+		}
+        ++cpt;
     }
+  }
+  
+  cpt=0;
      
-  }
   if (rj!="TR")
-  {
-    transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());
+  {	
+    transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());// diff2=vectj-vecti (xj-xi)
 
-    for(vector<int>::iterator it = diff2.begin(); it != diff2.end(); ++it){
-        if(*it < 0){
+    for(vector<int>::iterator it = diff2.begin(); it != diff2.end(); ++it)
+    {
+		if(*it < 0)
+        {
           cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-        } else if(*it > 0) {
-          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          ControlArc(names[cpt], rj, true, static_cast <unsigned int> (vectj[cpt])+1); // initializes an inhibitor-arc
+		  cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
         }
+        
+        else if(*it > 0)
+        {
+          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          ControlArc(names[cpt], rj, false, static_cast <unsigned int> (vecti[cpt])+1); // initializes a read-arc
+          cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
+        }
+        ++cpt;
     }
   }
-
 }
 
 void Network::findWPC(){
@@ -599,7 +617,7 @@ void Network::findWPC(){
     
           if (testWPC(xi, xj, ri, rj)) //WPC
           {
-            burgerFrites(xi, xj, ri, rj);
+            createControlArc(xi, xj, ri, rj);
           }
           ++ij;
         }
