@@ -15,7 +15,7 @@ using std::endl;
 
 class State{
   string name; // name of the state
-  vector<int> vec;
+  vector<int> vec; //a vector of state
   
   void swap(State&);
   

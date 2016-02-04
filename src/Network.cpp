@@ -331,14 +331,14 @@ ostream& operator<<(ostream& o ,const Network& net){
 
 
 string Network::findPartitions(string& seq){
-  bool found = false;
+  bool found = false; //Partitions not found
   string id; //Id's partition
   vector<string> vseq; //Vector of sequences
-  vector<string>::iterator itvseq;
-  map<string,vector<string> >::iterator it = partitions.begin();
+  vector<string>::iterator itvseq; //vector of partitions
+  map<string,vector<string> >::iterator it = partitions.begin(); //
   while (it != partitions.end() && !found) {
-    id = it->first;
-    vseq = it->second;
+    id = it->first; //
+    vseq = it->second; //
     itvseq = find(vseq.begin(),vseq.end(),seq);
     if (itvseq != vseq.end()) //We found seq
     {
@@ -455,9 +455,9 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
     map<string, State > all_states(states);
     all_states.insert(terminal_states.begin(), terminal_states.end());
     
-    map<string, State >::iterator jt = all_states.begin();  // iterates over the states
+    map<string, State >::iterator jt = all_states.begin();  //iterates over the states
     do {
-        const vector<int> & svec = (jt->second).getVector();  // state vector
+        const vector<int> & svec = (jt->second).getVector();  //state vector
         size_t i = 0;  
         bool all_found = true;  // says whether all the coordinates of the two vectors are equal
         do {

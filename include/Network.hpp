@@ -29,7 +29,7 @@ class Network{
   vector<string> names; //Name of places
   vector<int> upper; //max token capacity
   map<string,State> terminal_states; //Contains terminal_states
-  map<string,vector<int> > reactions;
+  map<string,vector<int> > reactions; // Contains reactions
   map<string,vector<PairSR > > sequences;
   map<string,vector<string> > partitions;
   vector<PairSS > spc; //Vector of sequences that are in SPC
@@ -40,14 +40,14 @@ class Network{
   void readReactions(ifstream&); //Reads REACTIONS section
   void readSequences(ifstream&); //Reads SEQUENCES section
   void readPartitions(ifstream&); //Reads PARTITIONS section
-  string findPartitions(string&) ;
+  string findPartitions(string&); //Finds PARTITIONS
   bool testWPC(const string & xi, const string & xj, const string & ri, const string & rj) ;  // Test if the couple of pairs states and transitions are in a WPC
   bool isTerminal(const string & xi) {return terminal_states.find(xi) != terminal_states.end(); }  // Test whether a state is terminal
   void addFinalTerminal() ;  // Add the final state in the sequences if it is terminal
-  void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); //
+  void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); //create a control arc between xi and xj
   
   public:
-  void removeSequences() ; //Remove all sequences that contains a terminal_state
+  void removeSequences() ; //Remove all sequences that contains a terminal state
   void print(ostream& o = cout) const;
   void printSPC(ostream& o = cout) const;
   void printTS(ostream& o = cout) const ;
