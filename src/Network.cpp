@@ -379,7 +379,7 @@ void Network::findSequences() { //find all sequences that contains a terminal_st
   sequences.erase(it);*/
       }
       ++itv;
-    } 
+    }
   }
 }
 
@@ -534,6 +534,8 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
   const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector(); // transform the string into a vector xi 
   const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector(); // transform the string into a vector xj
   unsigned int cpt=0;
+  
+  string const  wpc=xi+ " "+xj+ " "+ri+" "+rj; 
 
  
   if(ri!="TR")
@@ -544,16 +546,22 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
     {
     if(*it < 0)
         {
-          // cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          control_arcs.insert(ControlArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1)); // add an inhibitor-arc
-          // cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
-      } 
+		  ControlArc inhibArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1);
+          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(inhibArc); // add an inhibitor-arc
+          cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl;
+          control_arc_to_wpc[inhibArc].push_back(wpc); 
+		} 
         else if(*it > 0) 
         {
-          // cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          control_arcs.insert(ControlArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1)); // add a read-arc
-          // cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
-    }
+		  ControlArc readArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1);
+          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(readArc); // add a read-arc
+          cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
+          control_arc_to_wpc[readArc].push_back(wpc);
+		}
+		
+		
         ++cpt;
     }
   }
@@ -568,22 +576,40 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
     {
     if(*it < 0)
         {
-          // cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          control_arcs.insert(ControlArc(names[cpt], rj, true, static_cast <unsigned int> (vectj[cpt])+1)); // add an inhibitor-arc
-          // cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
+		  ControlArc inhibArc(names[cpt], rj, true, static_cast <unsigned int> (vectj[cpt])+1);
+          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(inhibArc); // add an inhibitor-arc
+          cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
+          control_arc_to_wpc[inhibArc].push_back(wpc);
         }
         
         else if(*it > 0)
         {
-          // cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          control_arcs.insert(ControlArc(names[cpt], rj, false, static_cast <unsigned int> (vecti[cpt])+1)); // add a read-arc
-          // cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
+		  ControlArc readArc(names[cpt], rj, false, static_cast <unsigned int> (vecti[cpt])+1);
+          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(readArc); // add a read-arc
+          cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
+          control_arc_to_wpc[readArc].push_back(wpc);
         }
         ++cpt;
     }
   }
 }
 
+void Network::printWPC(ostream& o) const
+{
+	for(map<ControlArc, vector<string>, CompareControlArc> :: const_iterator it1 = control_arc_to_wpc.begin(); it1 != control_arc_to_wpc.end(); ++it1)
+	{
+		// *it -> std::pair<ControlArc, vector<string>> const &
+		o << " " << it1->first << " : ";
+		for(vector<string> :: const_iterator it2 = (it1->second).begin(); it2 != it1->second.end(); ++it2)
+		{
+			o << " " << *it2 << ", "; 
+		}
+		o << "\n";
+	}
+	
+}
 void Network::findWPC(){
   vector< vector<PairSR > > vseq;
   vector<PairSR > vi, vj;
@@ -628,6 +654,7 @@ void Network::findWPC(){
     }
   }
   
+  printWPC();
 }
 
 void Network::printSPC(ostream& o) const{

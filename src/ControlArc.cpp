@@ -19,3 +19,9 @@ const unsigned int & ControlArc::getWeight() const
 {
   return weight;
 }
+
+ostream& operator << (ostream& o,const ControlArc& ca)
+{
+	o << " " << ca.getPlace() << " " << ca.getReaction() << " inh? " << ca.isInhibitor() << " " << ca.getWeight();	
+	return o;
+}

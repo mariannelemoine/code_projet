@@ -14,7 +14,6 @@ class ControlArc{
   
   public :
 
-  ControlArc();
   ControlArc(string p, string reac, bool inhib, unsigned int w) : place(p), reaction(reac), 
     inhibitor(inhib), weight(w){}
   ~ControlArc(){}
@@ -35,5 +34,6 @@ struct CompareControlArc{
   }
 };
 
+ostream& operator << (ostream&,const ControlArc&);
 
 #endif
