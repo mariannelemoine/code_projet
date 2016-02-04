@@ -2,6 +2,7 @@
 #define NETWORK__H
 
 #include "State.hpp"
+#include "ControlArc.hpp"
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
@@ -23,10 +24,6 @@ using std::set;
 
 typedef pair<string,string> PairSR; //Pair (state,reaction)
 typedef pair<string,string> PairSS; //Pair (sequence,sequence)
-
-/* foward declarations */
-class ControlArc;
-struct CompareControlArc;
 
 class Network{
   int dim; //Number of places
