@@ -1,21 +1,21 @@
 #include "ControlArc.hpp"
 
-const string & ControlArc::getPlace()
+const string & ControlArc::getPlace() const
 {
-	return place;
+  return place;
 }
   
-const string & ControlArc::getReaction()
+const string & ControlArc::getReaction() const
 {
-	return reaction;
+  return reaction;
 }
 
-const bool & ControlArc::isInhibitor()
+const bool & ControlArc::isInhibitor() const
 {
-	return inhibitor;
+  return inhibitor;
 }
 
-const unsigned int & ControlArc::getWeight()
+const unsigned int & ControlArc::getWeight() const
 {
-	return weight;
+  return weight;
 }

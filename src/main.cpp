@@ -19,6 +19,7 @@ int main(int argc,char** argv){
     n.findSequences();
     n.findSPC();
     n.findWPC();
+    n.printControlArcs();
     n.writePorta(name);
     
   }

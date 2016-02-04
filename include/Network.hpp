@@ -25,6 +25,7 @@ using std::set;
 typedef pair<string,string> PairSR; //Pair (state,reaction)
 typedef pair<string,string> PairSS; //Pair (sequence,sequence)
 
+
 class Network{
   int dim; //Number of places
   map<string,State> states; //Contains each state with its id_string (eg X1)
@@ -36,7 +37,7 @@ class Network{
   map<string,vector<string> > partitions;
   vector<PairSS > spc; //Vector of sequences that are in SPC
   vector<string> tsequences; //Sequences' id that contains a terminal_state
-  set<ControlArc, CompareControlArc> control_arcs;  // contain all the control arcs // BUG
+  set<ControlArc, CompareControlArc> control_arcs;  // contain all the control arcs
   
   
   void readStates(ifstream&); //Reads STATES and TERMINAL_STATES
@@ -47,7 +48,9 @@ class Network{
   bool testWPC(const string & xi, const string & xj, const string & ri, const string & rj) ;  // Test if the couple of pairs states and transitions are in a WPC
   bool isTerminal(const string & xi) {return terminal_states.find(xi) != terminal_states.end(); }  // Test whether a state is terminal
   void addFinalTerminal() ;  // Add the final state in the sequences if it is terminal
-  void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); //create a control arc between xi and xj
+
+  void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); // create and add the control arcs to resolve the WPC between (xi, ri) and (xj, rj)
+
   
   public:
   void removeSequences() ; //Remove all sequences that contains a terminal state
@@ -59,6 +62,8 @@ class Network{
   void findSPC() ; //Create the vector of sequences that are in SPC
   void findWPC() ; // Create the vector of s   that are in WPC
   void writePorta(string) const;
+  
+  void printControlArcs() const;  // Print the control arcs contained by control_arcs
   
 };
 

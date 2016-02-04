@@ -544,15 +544,15 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
     {
     if(*it < 0)
         {
-          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          ControlArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1); // initializes an inhibitor-arc
-          cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
+          // cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(ControlArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1)); // add an inhibitor-arc
+          // cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
       } 
         else if(*it > 0) 
         {
-          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          ControlArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1); // initializes a read-arc
-          cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
+          // cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(ControlArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1)); // add a read-arc
+          // cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
     }
         ++cpt;
     }
@@ -568,16 +568,16 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
     {
     if(*it < 0)
         {
-          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          ControlArc(names[cpt], rj, true, static_cast <unsigned int> (vectj[cpt])+1); // initializes an inhibitor-arc
-      cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
+          // cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(ControlArc(names[cpt], rj, true, static_cast <unsigned int> (vectj[cpt])+1)); // add an inhibitor-arc
+          // cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
         }
         
         else if(*it > 0)
         {
-          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
-          ControlArc(names[cpt], rj, false, static_cast <unsigned int> (vecti[cpt])+1); // initializes a read-arc
-          cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
+          // cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
+          control_arcs.insert(ControlArc(names[cpt], rj, false, static_cast <unsigned int> (vecti[cpt])+1)); // add a read-arc
+          // cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
         }
         ++cpt;
     }
@@ -618,6 +618,7 @@ void Network::findWPC(){
     
           if (testWPC(xi, xj, ri, rj)) //WPC
           {
+            found = true;
             createControlArc(xi, xj, ri, rj);
           }
           ++ij;
@@ -696,4 +697,11 @@ void Network::writePorta(string file) const{
   fic << endl << "END" ;
   
   fic.close();
+}
+
+void Network::printControlArcs() const {
+  for(std::set<ControlArc, CompareControlArc>::iterator it = control_arcs.begin(); it != control_arcs.end() ;++it){
+    std::cout << it->getPlace() << " " << it->getReaction() << " " << it->isInhibitor() << " " << it->getWeight() << std::endl;
+  }
+  
 }

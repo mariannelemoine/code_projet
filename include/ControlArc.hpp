@@ -17,7 +17,7 @@ class ControlArc{
   ControlArc();
   ControlArc(string p, string reac, bool inhib, unsigned int w) : place(p), reaction(reac), 
     inhibitor(inhib), weight(w){}
-  ~ControlArc(){std::cout<< "coucou" <<std::endl;}
+  ~ControlArc(){}
   
   const string & getPlace() const;
   const string & getReaction() const;
@@ -28,9 +28,10 @@ class ControlArc{
 
 };
 
+//  Fonctor used for the set container
 struct CompareControlArc{
   bool operator ()(const ControlArc & arc1, const ControlArc & arc2){
-    return (arc1.getPlace() == arc2.getPlace() && arc1.getReaction() == arc2.getReaction() && arc1.isInhibitor() == arc2.isInhibitor() && arc1.getWeight() == arc2.getWeight());
+    return (arc1.getPlace() < arc2.getPlace() || arc1.getReaction() < arc2.getReaction() || arc1.isInhibitor() < arc2.isInhibitor() || arc1.getWeight() < arc2.getWeight());
   }
 };
 
