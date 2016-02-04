@@ -51,7 +51,6 @@ class Network{
 
   void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj); // create and add the control arcs to resolve the WPC between (xi, ri) and (xj, rj)
 
-  
   public:
   void removeSequences() ; //Remove all sequences that contains a terminal state
   void print(ostream& o = cout) const;
