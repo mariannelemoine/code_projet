@@ -2,25 +2,37 @@
 #define CONTROLARC__H
 
 #include "State.hpp"
-#include "Network.hpp"
+#include <math.h>
 
 class ControlArc{
 
-	string place;  // the place which the arc is connected
-	string reaction;  // the reaction in relation with the arc   
-	bool inhibitor;  // true if the arc is an inhibitor-arc 
-	vector<PairSS> wpc; // wpcs that can be resolved by adding the arc to the network
-	unsigned int weight;  // weight of the arc
-	
-  public:
+  string place;  // the place which the arc is connected
+  string reaction;  // the reaction in relation with the arc   
+  bool inhibitor;  // true if the arc is an inhibitor-arc 
+  // vector<PairSS> wpc; // wpcs that can be resolved by adding the arc to the network
+  unsigned int weight;  // weight of the arc
   
-  ControlArc(){}
-  ControlArc(string p, string reac, bool ini, unsigned int w): place(p), reaction(reac), inhibitor(ini), weight(w){}
+  public :
+
+  ControlArc();
+  ControlArc(string p, string reac, bool inhib, unsigned int w) : place(p), reaction(reac), 
+    inhibitor(inhib), weight(w){}
+  ~ControlArc(){std::cout<< "coucou" <<std::endl;}
   
-  const string & getPlace(); // get the place
-  const string & getReaction(); // get the reaction
-  const bool & isInhibitor(); // get the inhibitor
-  const unsigned int & getWeight(); // get the weight of the arc
+  const string & getPlace() const;
+  const string & getReaction() const;
+  const bool & isInhibitor() const;
+  const unsigned int & getWeight() const;
+  
+  
+
 };
+
+struct CompareControlArc{
+  bool operator ()(const ControlArc & arc1, const ControlArc & arc2){
+    return (arc1.getPlace() == arc2.getPlace() && arc1.getReaction() == arc2.getReaction() && arc1.isInhibitor() == arc2.isInhibitor() && arc1.getWeight() == arc2.getWeight());
+  }
+};
+
 
 #endif
