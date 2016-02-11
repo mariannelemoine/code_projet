@@ -536,7 +536,7 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
   unsigned int cpt=0;
   
   string const  wpc=xi+ " "+xj+ " "+ri+" "+rj; 
-
+  wpcs.insert(wpc);
  
   if(ri!="TR")
   {    
@@ -546,20 +546,20 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
     {
     if(*it < 0)
         {
-      ControlArc inhibArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1);
+          ControlArc inhibArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1);
           cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(inhibArc); // add an inhibitor-arc
           cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl;
           control_arc_to_wpc[inhibArc].push_back(wpc); 
-    } 
+        } 
         else if(*it > 0) 
         {
-      ControlArc readArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1);
+          ControlArc readArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1);
           cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(readArc); // add a read-arc
           cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
           control_arc_to_wpc[readArc].push_back(wpc);
-    }
+        }
     
     
         ++cpt;
@@ -654,7 +654,6 @@ void Network::findWPC(){
     }
   }
   
-  printWPC();
 }
 
 void Network::printSPC(ostream& o) const{
@@ -730,5 +729,31 @@ void Network::printControlArcs() const {
   for(std::set<ControlArc, CompareControlArc>::iterator it = control_arcs.begin(); it != control_arcs.end() ;++it){
     std::cout << it->getPlace() << " " << it->getReaction() << " " << it->isInhibitor() << " " << it->getWeight() << std::endl;
   }
+  
+}
+
+void Network::writeIncidenceMatrix(string file) const {
+  size_t dim = control_arcs.size();  // number of control arcs 
+  size_t row = wpcs.size();  // number of wpcs 
+  ofstream fic;
+  fic.open(file.c_str());
+  
+  fic <<"DIM = "<< dim << "\n" << "\n";
+  
+  fic << "ROW = "<< row << "\n" << "\n";
+  
+  fic << "MATRIX" << "\n" << "\n";
+  
+  for(std::set<string>::iterator wpc_it = wpcs.begin(); wpc_it != wpcs.end(); ++wpc_it){  // iteration over the wpcs
+    fic << "    ";
+    for(map<ControlArc, vector<string>, CompareControlArc> :: const_iterator ca_it = control_arc_to_wpc.begin(); ca_it != control_arc_to_wpc.end(); ++ca_it){  // iteration over control arcs
+      vector<string>::const_iterator itvec = std::find((ca_it->second).begin(),(ca_it->second).end(),*wpc_it);  // look if the wpc is resolved by the control arc
+      fic << ( (itvec != (ca_it->second).end()) ? 1 : 0 ) << " "; 
+    }
+    fic << "\n";
+  }
+  
+  fic << "\n" <<"END" << "\n";
+  fic.close();
   
 }

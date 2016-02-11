@@ -29,7 +29,7 @@ class ControlArc{
 
 //  Fonctor used for the set container
 struct CompareControlArc{
-  bool operator ()(const ControlArc & arc1, const ControlArc & arc2){
+  bool operator ()(const ControlArc & arc1, const ControlArc & arc2) const{
     return (arc1.getPlace() < arc2.getPlace() || arc1.getReaction() < arc2.getReaction() || arc1.isInhibitor() < arc2.isInhibitor() || arc1.getWeight() < arc2.getWeight());
   }
 };
