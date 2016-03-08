@@ -22,6 +22,7 @@ const unsigned int & ControlArc::getWeight() const
 
 ostream& operator << (ostream& o,const ControlArc& ca)
 {
-	o << " " << ca.getPlace() << " " << ca.getReaction() << " inh? " << ca.isInhibitor() << " " << ca.getWeight();	
-	return o;
+  string inh = (ca.isInhibitor() ? "inh" : "read");
+  o << " " << ca.getPlace() << " " << ca.getReaction() << " " << inh << " " << ca.getWeight();  
+  return o;
 }

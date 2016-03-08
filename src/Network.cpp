@@ -480,9 +480,7 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
         sequences[it->first].push_back(ts);  
       }
     }
-    
-    // TODO : do something if there is no state vector found
-    
+
   }
 }
 
@@ -500,7 +498,6 @@ bool Network::testWPC(const string & xi, const string & xj, const string & ri, c
       vi = states[xi].getVector();
     }
     
-    /* TODO : facto needed*/
     
     if(isTerminal(xj)){
       vj = terminal_states[xj].getVector(); // get the vector of xj
@@ -748,12 +745,23 @@ void Network::writeIncidenceMatrix(string file) const {
     fic << "    ";
     for(map<ControlArc, vector<string>, CompareControlArc> :: const_iterator ca_it = control_arc_to_wpc.begin(); ca_it != control_arc_to_wpc.end(); ++ca_it){  // iteration over control arcs
       vector<string>::const_iterator itvec = std::find((ca_it->second).begin(),(ca_it->second).end(),*wpc_it);  // look if the wpc is resolved by the control arc
-      fic << ( (itvec != (ca_it->second).end()) ? 1 : 0 ) << " "; 
+      fic << ( (itvec != (ca_it->second).end()) ? 1 : 0 ) << " ";
     }
     fic << "\n";
   }
   
   fic << "\n" <<"END" << "\n";
+  unsigned int i = 1;
+  for(std::set<string>::iterator wpc_it = wpcs.begin(); wpc_it != wpcs.end(); ++wpc_it){
+    fic << "ROW " << i << " " << *wpc_it << "\n";
+    ++i;
+  }
+  unsigned int j = 1; 
+  for(set<ControlArc, CompareControlArc> :: iterator ca_it = control_arcs.begin(); ca_it != control_arcs.end(); ++ca_it){
+    fic << "COL " << j << " " << *ca_it << "\n";
+    ++j;
+  }
+  
   fic.close();
   
 }
