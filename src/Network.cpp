@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <iterator>
+#include <iomanip>
 
 
 using std::stringstream;
@@ -473,17 +474,17 @@ void Network::addFinalTerminal() {  // HAS to be done only ONE time
       
       string id = ((--jt)->second).getName();  // get the name of the name of the state
       // Why not using (--jt)->first ?
+      cout<<id<<endl;
       
       ++jt;
       PairSR ts = make_pair( id ,"TR" );  // make a pair with the name of the state and the terminal reaction 
       for(vector<string>::iterator sit = (it->second).begin(); sit != (it->second).end();++sit ) {  // add the pair at the end of each sequances of the partition
-        sequences[it->first].push_back(ts);  
+        sequences[*sit].push_back(ts);  
       }
     }
 
   }
 }
-
 
 
 bool Network::testWPC(const string & xi, const string & xj, const string & ri, const string & rj){
@@ -525,14 +526,14 @@ bool Network::testWPC(const string & xi, const string & xj, const string & ri, c
   return res;
 }
 
-void Network::createControlArc(const string & xi, const string & xj, const string & ri, const string & rj)
+void Network::createControlArc(const string & xi, const string & xj, const string & ri, const string & rj, const string & si, const string & sj)
 {
   vector<int> diff1, diff2; // difference vector
   const vector<int> & vecti=(isTerminal(xi) ? terminal_states : states)[xi].getVector(); // transform the string into a vector xi 
   const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector(); // transform the string into a vector xj
   unsigned int cpt=0;
   
-  string const  wpc=xi+ " "+xj+ " "+ri+" "+rj; 
+  string const  wpc="(" + xi +", "+ri+") ("+xj+", "+rj+") "+ si+" "+sj; 
   wpcs.insert(wpc);
  
   if(ri!="TR")
@@ -547,7 +548,8 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
           cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(inhibArc); // add an inhibitor-arc
           cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl;
-          control_arc_to_wpc[inhibArc].push_back(wpc); 
+          (control_arc_to_wpc[inhibArc]).push_back(wpc);
+          cout << (control_arc_to_wpc.find(inhibArc) != control_arc_to_wpc.end()) << endl;
         } 
         else if(*it > 0) 
         {
@@ -555,7 +557,8 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
           cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(readArc); // add a read-arc
           cout << " " << names[cpt] << " "<< ri << " " << static_cast <unsigned int> (vectj[cpt])+1 << endl; 
-          control_arc_to_wpc[readArc].push_back(wpc);
+          (control_arc_to_wpc[readArc]).push_back(wpc);
+          cout << (control_arc_to_wpc.find(readArc) != control_arc_to_wpc.end()) << endl;
         }
     
     
@@ -577,7 +580,8 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
           cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(inhibArc); // add an inhibitor-arc
           cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])-1 << endl;
-          control_arc_to_wpc[inhibArc].push_back(wpc);
+          (control_arc_to_wpc[inhibArc]).push_back(wpc);
+          cout << (control_arc_to_wpc.find(inhibArc) != control_arc_to_wpc.end()) << endl;
         }
         
         else if(*it > 0)
@@ -586,7 +590,8 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
           cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(readArc); // add a read-arc
           cout << " " << names[cpt] << " "<< rj << " " << static_cast <unsigned int> (vecti[cpt])+1 << endl; 
-          control_arc_to_wpc[readArc].push_back(wpc);
+          (control_arc_to_wpc[readArc]).push_back(wpc);
+          cout << (control_arc_to_wpc.find(readArc) != control_arc_to_wpc.end()) << endl;
         }
         ++cpt;
     }
@@ -616,12 +621,14 @@ void Network::findWPC(){
   unsigned ii, ij;
   bool found;
   addFinalTerminal();
+  //addFinalTerminal2();
   for(map<string,vector<PairSR > >::const_iterator it = sequences.begin(); it != sequences.end() ; ++it)
   {
     string id = it->first;
+    cout<< id << endl;
     vid.push_back(id); //Get the ID
     vseq.push_back(it->second); //Get the sequence
-    
+
   }
   
   for( unsigned i = 0 ; (i+1) < vseq.size(); ++i) {
@@ -639,10 +646,10 @@ void Network::findWPC(){
           rj = vj[ij].second;
 
     
-          if (testWPC(xi, xj, ri, rj)) //WPC
+          if (testWPC(xi, xj, ri, rj )) //WPC
           {
             found = true;
-            createControlArc(xi, xj, ri, rj);
+            createControlArc(xi, xj, ri, rj, vid[i], vid[j]);
           }
           ++ij;
         }
