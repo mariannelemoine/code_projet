@@ -13,7 +13,7 @@ class ControlArc{
   unsigned int weight;  // weight of the arc
   
   public :
-
+  
   ControlArc(string p, string reac, bool inhib, unsigned int w) : place(p), reaction(reac), 
     inhibitor(inhib), weight(w){}
   ~ControlArc(){}

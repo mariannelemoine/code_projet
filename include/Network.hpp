@@ -59,7 +59,7 @@ class Network{
   void printSPC(ostream& o = cout) const;
   void printTS(ostream& o = cout) const ;
   void printWPC(ostream& o =cout) const;
-  void printControlArcs() const;  // Print the control arcs contained by control_arcs
+  void printControlArcs(ostream& o = cout) const;  // Print the control arcs contained by control_arcs
   void init(string); //Initializes the network from an input file
   void findSequences() ; //Remove all sequences that contains a terminal_state
   void findSPC() ; //Create the vector of sequences that are in SPC
