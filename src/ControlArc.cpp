@@ -20,6 +20,11 @@ const unsigned int & ControlArc::getWeight() const
   return weight;
 }
 
+/*const set<string> & getWpc() const
+{
+  return wpc;
+}*/
+
 ostream& operator << (ostream& o,const ControlArc& ca)
 {
   string inh = (ca.isInhibitor() ? "inh" : "read");

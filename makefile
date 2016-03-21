@@ -3,7 +3,7 @@ TARGET   = create_ILP_SCgraph
 
 CC       = g++
 # compiling flags here
-CFLAGS   = -Wall -Wextra -ansi -pedantic -Iinclude -ggdb -Wfatal-errors -D_GLIBCXX_DEBUG
+CFLAGS   = -Wall -Wextra -ansi -pedantic -Iinclude -Wfatal-errors 
 
 
 # change these to set the proper directories where each files shoould be

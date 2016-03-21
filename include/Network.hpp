@@ -40,6 +40,7 @@ class Network{
   set<ControlArc, CompareControlArc> control_arcs;  // contain all the control arcs
   map<ControlArc, vector<string>, CompareControlArc> control_arc_to_wpc; //associates to control arc the list of wpcs it solves
   set<string> wpcs; // contains the wpcs
+  map<string, set<string> > seq_wpc; // sequences that are in wpc 
   
   void readStates(ifstream&); //Reads STATES and TERMINAL_STATES
   void readReactions(ifstream&); //Reads REACTIONS section
@@ -48,7 +49,7 @@ class Network{
   string findPartitions(string&); //Finds PARTITIONS
   bool testWPC(const string & xi, const string & xj, const string & ri, const string & rj) ;  // Test if the couple of pairs states and transitions are in a WPC
   bool isTerminal(const string & xi) {return terminal_states.find(xi) != terminal_states.end(); }  // Test whether a state is terminal
-  void addFinalTerminal() ;  // Add the final state in the sequences if it is terminal DEPRECATED
+  void addFinalTerminal() ;  // Add the final state in the sequences if it is terminal
 
   void createControlArc(const string & xi, const string & xj, const string & ri, const string & rj, const string & si, const string & sj); // create and add the control arcs to resolve the WPC between (xi, ri) and (xj, rj)
   

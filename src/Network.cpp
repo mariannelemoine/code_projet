@@ -531,8 +531,12 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
   const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector(); // transform the string into a vector xj
   unsigned int cpt=0;
   
-  string const  wpc="(" + xi +", "+ri+") ("+xj+", "+rj+") "+ si+" "+sj; 
-  wpcs.insert(wpc);
+  string const  wpc="(" + xi +", "+ri+") ("+xj+", "+rj+")"; 
+  wpcs.insert(wpc);  
+  
+  // add the two sequences that are in wpc 
+  seq_wpc[wpc].insert(si);
+  seq_wpc[wpc].insert(sj);
  
  
   if(ri!="TR")
@@ -612,11 +616,10 @@ void Network::printWPC(ostream& o) const
 {
   for(map<ControlArc, vector<string>, CompareControlArc> :: const_iterator it1 = control_arc_to_wpc.begin(); it1 != control_arc_to_wpc.end(); ++it1)
   {
-    // *it -> std::pair<ControlArc, vector<string>> const &
     o << " " << it1->first << " : ";
     for(vector<string> :: const_iterator it2 = (it1->second).begin(); it2 != (it1->second).end(); ++it2)
     {
-      o << " " << *it2 << ", "; 
+      o <<*it2 << ", "; 
     }
     o << "\n";
   }
@@ -768,7 +771,13 @@ void Network::writeIncidenceMatrix(string file) const {
   fic << "\n" <<"END" << "\n";
   unsigned int i = 1;
   for(std::set<string>::iterator wpc_it = wpcs.begin(); wpc_it != wpcs.end(); ++wpc_it){
-    fic << "ROW " << i << " " << *wpc_it << "\n";
+    string wpc_string = *wpc_it;
+    set<string> seqs = seq_wpc.at(wpc_string);
+    fic << "ROW " << i << " " << wpc_string<< " ";
+    for(std::set<string>::iterator seq_it = seqs.begin(); seq_it != seqs.end(); ++seq_it){
+      fic << *seq_it << " ";
+    }
+    fic <<"\n";
     ++i;
   }
   unsigned int j = 1; 
