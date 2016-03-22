@@ -19,8 +19,8 @@ int main(int argc,char** argv){
     n.findSequences();
     n.findSPC();
     n.findWPC();
-    n.printWPC();
-    n.printControlArcs();
+    // n.printWPC();
+    // n.printControlArcs();
     n.writePorta(name);
     name = "matrix";
     n.writeIncidenceMatrix(name);

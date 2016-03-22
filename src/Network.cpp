@@ -531,7 +531,7 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
   const vector<int> & vectj=(isTerminal(xj) ? terminal_states : states)[xj].getVector(); // transform the string into a vector xj
   unsigned int cpt=0;
   
-  string const  wpc="(" + xi +", "+ri+") ("+xj+", "+rj+")"; 
+  string const  wpc="(" + xi +", "+ri+") ("+xj+", "+rj+")";  // wpc 
   wpcs.insert(wpc);  
   
   // add the two sequences that are in wpc 
@@ -541,16 +541,14 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
  
   if(ri!="TR")
   {    
-    transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());//diff1=vecti-vectj
+    transform(vecti.begin(), vecti.end(), vectj.begin(), std::back_inserter(diff1), std::minus <int>());  // diff1=vecti-vectj
         
     for(vector<int>::iterator it = diff1.begin(); it != diff1.end(); ++it)
     {
     if(*it < 0)
         {
           ControlArc inhibArc = ControlArc(names[cpt], ri, true, static_cast <unsigned int> (vecti[cpt])+1);
-          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(inhibArc); // add an inhibitor-arc
-          cout << inhibArc << endl;
           if(control_arc_to_wpc.find(inhibArc) != control_arc_to_wpc.end()){
               control_arc_to_wpc[inhibArc].push_back(wpc);
           } else {
@@ -560,9 +558,7 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
         else if(*it > 0) 
         {
           ControlArc readArc = ControlArc(names[cpt], ri, false, static_cast <unsigned int> (vectj[cpt])+1);
-          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(readArc); // add a read-arc
-          cout << readArc << endl;
           if(control_arc_to_wpc.find(readArc) != control_arc_to_wpc.end()){
               control_arc_to_wpc[readArc].push_back(wpc);
           } else {
@@ -578,16 +574,14 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
      
   if (rj!="TR")
   { 
-    transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());// diff2=vectj-vecti (xj-xi)
+    transform(vectj.begin(), vectj.end(), vecti.begin(), std::back_inserter(diff2), std::minus <int>());  // diff2=vectj-vecti (xj-xi)
 
     for(vector<int>::iterator it = diff2.begin(); it != diff2.end(); ++it)
     {
     if(*it < 0)
         {
           ControlArc inhibArc = ControlArc(names[cpt], rj, true, static_cast <unsigned int> (vectj[cpt])+1);
-          cout<<"inhibiteur arc"<< " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(inhibArc); // add an inhibitor-arc
-          cout << inhibArc << endl;
           if(control_arc_to_wpc.find(inhibArc) != control_arc_to_wpc.end()){
               control_arc_to_wpc[inhibArc].push_back(wpc);
           } else {
@@ -598,9 +592,7 @@ void Network::createControlArc(const string & xi, const string & xj, const strin
         else if(*it > 0)
         {
           ControlArc readArc = ControlArc(names[cpt], rj, false, static_cast <unsigned int> (vecti[cpt])+1);
-          cout<< "read arc" << " "<< xi << " "<< xj << " " << ri << " " << rj <<endl;
           control_arcs.insert(readArc); // add a read-arc 
-          cout << readArc << endl;
           if(control_arc_to_wpc.find(readArc) != control_arc_to_wpc.end()){
               control_arc_to_wpc[readArc].push_back(wpc);
           } else {
@@ -633,7 +625,7 @@ void Network::findWPC(){
   PairSS pss;
   unsigned ii, ij;
   bool found;
-  addFinalTerminal();
+  addFinalTerminal(); 
   for(map<string,vector<PairSR > >::const_iterator it = sequences.begin(); it != sequences.end() ; ++it)
   {
     string id = it->first;
@@ -770,18 +762,16 @@ void Network::writeIncidenceMatrix(string file) const {
   
   fic << "\n" <<"END" << "\n";
   unsigned int i = 1;
-  for(std::set<string>::iterator wpc_it = wpcs.begin(); wpc_it != wpcs.end(); ++wpc_it){
-    string wpc_string = *wpc_it;
-    set<string> seqs = seq_wpc.at(wpc_string);
-    fic << "ROW " << i << " " << wpc_string<< " ";
-    for(std::set<string>::iterator seq_it = seqs.begin(); seq_it != seqs.end(); ++seq_it){
+  for(std::set<string>::const_iterator wpc_it = wpcs.begin(); wpc_it != wpcs.end(); ++wpc_it){  // iteration the rows 
+    fic << "ROW " << i << " " << *wpc_it<< " ";
+    for(std::set<string>::iterator seq_it = seq_wpc.at(*wpc_it).begin(); seq_it != seq_wpc.at(*wpc_it).end(); ++seq_it){  // the sequences involved in the conflict
       fic << *seq_it << " ";
     }
     fic <<"\n";
     ++i;
   }
   unsigned int j = 1; 
-  for(set<ControlArc, CompareControlArc> :: iterator ca_it = control_arcs.begin(); ca_it != control_arcs.end(); ++ca_it){
+  for(set<ControlArc, CompareControlArc> :: iterator ca_it = control_arcs.begin(); ca_it != control_arcs.end(); ++ca_it){  // iteration over the columns 
     fic << "COL " << j << " " << *ca_it << "\n";
     ++j;
   }
